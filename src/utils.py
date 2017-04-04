@@ -5,11 +5,11 @@ def crop_bounding_box_image(image, bounding_box):
 
 
 def resize_image(image, image_size):
-    pass
+    return cv2.resize(image, image_size)
 
 
 def save_image(image, path):
-    pass
+    cv2.imwrite(path, image)
 
 
 def load_image(filename):
