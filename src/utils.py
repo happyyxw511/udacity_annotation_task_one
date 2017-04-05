@@ -18,3 +18,12 @@ def load_image(filename):
 def show_image(image_name, image):
     cv2.imshow(image_name, image)
     cv2.waitKey(0)
+
+
+def list_files(in_path):
+    files = []
+    for (dirpath, dirnames, filenames) in os.walk(in_path):
+        files.extend(filenames)
+        break
+
+    return files
