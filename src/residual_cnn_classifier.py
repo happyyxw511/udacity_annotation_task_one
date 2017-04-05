@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import utils
 
 WEIGHTS_INIT_STDEV = .1
 
@@ -22,31 +23,33 @@ def nn_construction(x_input_shape, y_input_shape):
     return output, loss, accuracy
 
 
-def train(sess, loss, accuracy, input_x, input_y, dropout, checkpoint_path, batch_size=4):
+def train(sess, loss, accuracy, input_x_files, input_y, dropout, checkpoint_path, batch_shape, epoch=10):
     optimizer = tf.train.AdamOptimizer().minimize(loss)
-
-
     init = tf.global_variables_initializer()
     sess.run(init)
-    input_x_shape = input_x.shape()
-    num_imgs = input_x_shape[0]
+    num_imgs = len(input_x_files)
     cur_index = 0
     accuracy_list = []
-    while cur_index < num_imgs:
-        next_index = cur_index + batch_size
-        batch_images = input_x[cur_index: next_index]
-        batch_images_labels = input_y[cur_index: next_index]
-        _, accuracy_value = sess.run([optimizer, accuracy], feed_dict={
-            'X_Input:0': batch_images,
-            'Y_Input:0': batch_images_labels,
-            'dropout:0': dropout
-        })
-        accuracy_list.append(accuracy_value)
-        if len(accuracy_list) > 10:
-            saver = tf.train.Saver()
-            saver.save(sess, checkpoint_path)
-            print np.mean(accuracy_list)
-            accuracy_list = []
+    batch_size = batch_shape[0]
+    for _ in xrange(epoch):
+        np.random.shuffle(input_x_files)
+        while cur_index < num_imgs:
+            next_index = cur_index + batch_size
+            batch_images = np.zeros(batch_shape, dtype=np.float32)
+            for ind, filename in enumerate(input_x_files[cur_index: next_index]):
+                batch_images[ind] = utils.load_image(filename)
+            batch_images_labels = np.array(input_y[cur_index: next_index])
+            _, accuracy_value = sess.run([optimizer, accuracy], feed_dict={
+                'X_Input:0': batch_images,
+                'Y_Input:0': batch_images_labels,
+                'dropout:0': dropout
+            })
+            accuracy_list.append(accuracy_value)
+            if len(accuracy_list) > 10:
+                saver = tf.train.Saver()
+                saver.save(sess, checkpoint_path)
+                print np.mean(accuracy_list)
+                accuracy_list = []
 
 
 def infer(checkout_point, input_x, input_y=None):
@@ -76,12 +79,12 @@ def _fc_bias(size):
 
 
 def _fc_layer(input, output_size, dropout=1):
-    input_shape = input.get_shape()
+    input_shape = input.get_shape().as_list()
     reshaped_input = tf.reshape(input, [input_shape[0], -1])
-    feature_size = reshaped_input.get_shape()[1]
+    feature_size = reshaped_input.get_shape().as_list()[1]
     weights = _fc_weights(feature_size, output_size)
     bias = _fc_bias(output_size)
-    fc = tf.add(tf.matmul(weights, reshaped_input), bias)
+    fc = tf.add(tf.matmul(reshaped_input, weights), bias)
     return tf.nn.dropout(fc, dropout)
 
 

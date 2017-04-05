@@ -1,4 +1,6 @@
 import cv2
+import os
+import numpy as np
 
 def crop_bounding_box_image(image, bounding_box):
     pass
@@ -19,6 +21,10 @@ def show_image(image_name, image):
     cv2.imshow(image_name, image)
     cv2.waitKey(0)
 
+def to_one_hot(value, depth):
+    arr = np.zeros(depth)
+    arr[value] = 1
+    return arr
 
 def list_files(in_path):
     files = []
@@ -26,4 +32,4 @@ def list_files(in_path):
         files.extend(filenames)
         break
 
-    return files
+    return [x for x in files if x.endswith('.jpg')]
