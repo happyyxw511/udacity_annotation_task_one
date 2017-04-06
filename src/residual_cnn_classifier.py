@@ -28,12 +28,12 @@ def train(sess, loss, accuracy, input_x_files, input_y, dropout, checkpoint_path
     init = tf.global_variables_initializer()
     sess.run(init)
     num_imgs = len(input_x_files)
-    cur_index = 0
-    accuracy_list = []
     batch_size = batch_shape[0]
-    for _ in xrange(epoch):
+    for i in xrange(epoch):
+        cur_index = 0
+        accuracy_list = []
         np.random.shuffle(input_x_files)
-        while cur_index < num_imgs:
+        while cur_index + batch_size < num_imgs:
             next_index = cur_index + batch_size
             batch_images = np.zeros(batch_shape, dtype=np.float32)
             for ind, filename in enumerate(input_x_files[cur_index: next_index]):
@@ -45,15 +45,42 @@ def train(sess, loss, accuracy, input_x_files, input_y, dropout, checkpoint_path
                 'dropout:0': dropout
             })
             accuracy_list.append(accuracy_value)
-            if len(accuracy_list) > 10:
+            cur_index = next_index
+            if len(accuracy_list) > 2:
                 saver = tf.train.Saver()
                 saver.save(sess, checkpoint_path)
                 print np.mean(accuracy_list)
                 accuracy_list = []
 
 
-def infer(checkout_point, input_x, input_y=None):
-    pass
+def infer(sess, checkout_point, output, input_x_files, batch_shape, dropout, show_image=False, class_mapping=None):
+    saver = tf.train.Saver()
+    saver.restore(sess, checkout_point)
+    num_imgs = len(input_x_files)
+    batch_size = batch_shape[0]
+    curr = 0
+    while curr + batch_size < num_imgs:
+        next_index = curr + batch_size
+        selected_files = input_x_files[curr: next_index]
+        batch_images = np.zeros(batch_shape, dtype=np.float32)
+        for ind, filename in enumerate(selected_files):
+            print filename
+            batch_images[ind] = utils.load_image(filename)
+        preds = sess.run(
+            [output],
+            feed_dict={
+                'X_Input:0': batch_images,
+                'dropout:0': dropout
+            }
+        )
+        curr = next_index
+        if show_image and class_mapping:
+            for ind in xrange(batch_size):
+                class_ind = np.argmax(preds[ind])
+                utils.show_image(class_mapping[class_ind], batch_images[ind].astype(np.uint8))
+
+
+
 
 
 def _conv_layer(input, filter_size, num_out_channels, strides):

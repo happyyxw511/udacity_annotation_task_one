@@ -19,7 +19,7 @@ def load_image(filename):
 
 def show_image(image_name, image):
     cv2.imshow(image_name, image)
-    cv2.waitKey(0)
+    cv2.waitKey(1000)
 
 def to_one_hot(value, depth):
     arr = np.zeros(depth)
