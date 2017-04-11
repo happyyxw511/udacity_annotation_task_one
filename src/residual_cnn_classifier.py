@@ -32,6 +32,7 @@ def train(sess, loss, accuracy, input_x_files, input_y, dropout, checkpoint_path
     for i in xrange(epoch):
         cur_index = 0
         loss_list = []
+        accuracy_list = []
         np.random.shuffle(input_x_files)
         while cur_index + batch_size < num_imgs:
             next_index = cur_index + batch_size
@@ -39,18 +40,20 @@ def train(sess, loss, accuracy, input_x_files, input_y, dropout, checkpoint_path
             for ind, filename in enumerate(input_x_files[cur_index: next_index]):
                 batch_images[ind] = utils.load_image(filename)
             batch_images_labels = np.array(input_y[cur_index: next_index])
-            _, loss_value = sess.run([optimizer, loss], feed_dict={
+            _, loss_value, accuracy_value = sess.run([optimizer, loss, accuracy], feed_dict={
                 'X_Input:0': batch_images,
                 'Y_Input:0': batch_images_labels,
                 'dropout:0': dropout
             })
             loss_list.append(loss_value)
+            accuracy_list.append(accuracy_value)
             cur_index = next_index
             if len(loss_list) > 2:
                 saver = tf.train.Saver()
                 saver.save(sess, checkpoint_path)
-                print np.mean(loss_list)
+                print 'loss={}, accuracy={}'.format(np.mean(loss_list), np.mean(accuracy_list))
                 loss_list = []
+                accuracy_list = []
 
 
 def infer(sess, checkout_point, output, input_x_files, batch_shape, dropout, show_image=False, class_mapping=None):
