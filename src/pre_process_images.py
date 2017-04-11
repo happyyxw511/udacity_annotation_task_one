@@ -54,7 +54,10 @@ for index, row in labels_df.iterrows():
             label=label
         )
         index_record[key] = obj_index
-        resized_image = utils.resize_image(cropped_image, image_size)
-        utils.save_image(resized_image, save_image_full_path)
+        try:
+            resized_image = utils.resize_image(cropped_image, image_size)
+            utils.save_image(resized_image, save_image_full_path)
+        except Exception as e:
+            print 'failed image {}'.format(image_name)
 
 
