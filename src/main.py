@@ -3,7 +3,7 @@ import os
 import residual_cnn_classifier
 import utils
 
-BATCH_SIZE = 4
+BATCH_SIZE = 6
 IMAGE_SIZE = [BATCH_SIZE, 50, 50, 3]
 NUM_CLASSES = 3
 CLASS_MAP = {
@@ -27,7 +27,6 @@ if __name__ == '__main__':
     neural_net, loss, accuracy = residual_cnn_classifier.nn_construction(IMAGE_SIZE, [BATCH_SIZE, NUM_CLASSES])
     run_config = tf.ConfigProto(allow_soft_placement=True)
     img_files, labels = _get_files_and_labels(FLAGS.input_path)
-    print labels
     try:
         os.mkdir(FLAGS.checkpoint_path)
     except Exception:
