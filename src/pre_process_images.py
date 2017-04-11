@@ -6,14 +6,18 @@
 # 5. save the image to folder.
 
 import pandas as pd
-import random
+import tensorflow as tf
 import os
 import utils
 from  collections import defaultdict
 
-data_path = '../data'
-save_path = '../detected_image/'
-label_path = '../data/labels.csv'
+flags = tf.app.flags
+flags.DEFINE_string('data_path', default_value='../data', docstring='path for input data')
+flags.DEFINE_string('save_path', default_value='../detected_image/', docstring='path for input data')
+FLAGS=flags.FLAGS
+data_path = FLAGS.data_path
+save_path = FLAGS.save_path
+label_path = os.path.join(data_path, 'labels.csv')
 labels_df = pd.read_csv(label_path)
 
 print os.path.isfile(label_path)
