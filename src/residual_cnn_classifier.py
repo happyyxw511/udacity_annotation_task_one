@@ -35,7 +35,9 @@ def train(sess, loss, accuracy, input_x_files, input_y, dropout, checkpoint_path
         cur_index = 0
         loss_list = []
         accuracy_list = []
-        np.random.shuffle(input_x_files)
+        zipped = zip(input_x_files, input_y)
+        np.random.shuffle(zipped)
+        input_x_files, input_y = zip(*zipped)
         while cur_index + batch_size < num_imgs:
             next_index = cur_index + batch_size
             batch_images = np.zeros(batch_shape, dtype=np.float32)
