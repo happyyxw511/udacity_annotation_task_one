@@ -50,7 +50,7 @@ def train(sess, loss, accuracy, input_x_files, input_y, dropout, checkpoint_path
             loss_list.append(loss_value)
             accuracy_list.append(accuracy_value)
             cur_index = next_index
-            if len(loss_list) > 2:
+            if len(loss_list) > 5:
                 saver = tf.train.Saver()
                 saver.save(sess, checkpoint_path)
                 print 'loss={}, accuracy={}'.format(np.mean(loss_list), np.mean(accuracy_list))

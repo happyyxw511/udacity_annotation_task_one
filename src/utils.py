@@ -26,6 +26,26 @@ def to_one_hot(value, depth):
     arr[value] = 1
     return arr
 
+
+def resample_unbalanced_data(file_list, label_list):
+    file_list = np.array(file_list)
+    label_list = np.array(label_list)
+    index_list = np.array(range(len(label_list)))
+    unique, counts = np.unique(label_list, return_counts=True)
+    minimum_count = np.min(counts)
+    resampled_file_list = np.array([])
+    resampled_label_list = np.array([])
+    for ind, v in enumerate(unique):
+        indices = index_list[label_list[index_list] == v]
+        np.random.shuffle(indices)
+        selected_indices = indices[:minimum_count]
+        resampled_file_list = np.append(resampled_file_list, file_list[selected_indices])
+        resampled_label_list = np.append(resampled_label_list, label_list[selected_indices])
+    return resampled_file_list, resampled_label_list
+
+
+
+
 def list_files(in_path):
     files = []
     for (dirpath, dirnames, filenames) in os.walk(in_path):
