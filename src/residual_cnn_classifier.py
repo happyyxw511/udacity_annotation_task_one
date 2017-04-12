@@ -58,7 +58,7 @@ def train(sess, loss, accuracy, input_x_files, input_y, dropout, checkpoint_path
                 accuracy_list = []
 
 
-def infer(sess, checkout_point, output, input_x_files, batch_shape, dropout, show_image=False, class_mapping=None):
+def infer(sess, checkout_point, output, input_x_files, batch_shape, dropout, labels, show_error=False, class_mapping=None):
     saver = tf.train.Saver()
     saver.restore(sess, checkout_point)
     num_imgs = len(input_x_files)
@@ -67,6 +67,7 @@ def infer(sess, checkout_point, output, input_x_files, batch_shape, dropout, sho
     while curr + batch_size < num_imgs:
         next_index = curr + batch_size
         selected_files = input_x_files[curr: next_index]
+        selected_labels = labels[curr: next_index]
         batch_images = np.zeros(batch_shape, dtype=np.float32)
         for ind, filename in enumerate(selected_files):
             print filename
@@ -79,12 +80,12 @@ def infer(sess, checkout_point, output, input_x_files, batch_shape, dropout, sho
             }
         )
         curr = next_index
-        if show_image and class_mapping:
+        if show_error and class_mapping:
             for ind in xrange(batch_size):
                 class_ind = np.argmax(preds[ind])
-                utils.show_image(class_mapping[class_ind], batch_images[ind].astype(np.uint8))
-
-
+                true_label = np.argmax(selected_labels[ind])
+                if not class_ind == true_label:
+                    print '{} is falsed classied as {}'.format(class_mapping[true_label], class_mapping[class_ind])
 
 
 

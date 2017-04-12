@@ -36,7 +36,8 @@ if __name__ == '__main__':
                                       img_files,
                                       IMAGE_SIZE,
                                       FLAGS.dropout_probability,
-                                      show_image=True,
+                                      labels,
+                                      show_error=True,
                                       class_mapping=INDEX_TO_CLASS)
 
 
