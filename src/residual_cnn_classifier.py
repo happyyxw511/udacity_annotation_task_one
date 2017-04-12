@@ -70,7 +70,6 @@ def infer(sess, checkout_point, output, input_x_files, batch_shape, dropout, lab
         selected_labels = labels[curr: next_index]
         batch_images = np.zeros(batch_shape, dtype=np.float32)
         for ind, filename in enumerate(selected_files):
-            print filename
             batch_images[ind] = utils.load_image(filename)
         preds = sess.run(
             [output],
