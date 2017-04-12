@@ -23,6 +23,7 @@ def show_image(image_name, image):
 
 def to_one_hot(value, depth):
     arr = np.zeros(depth)
+    print value
     arr[value] = 1
     return arr
 
