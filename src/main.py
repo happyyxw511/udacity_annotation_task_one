@@ -22,6 +22,7 @@ def _get_files_and_labels(img_dir):
     files = utils.list_files(img_dir)
     labels = [CLASS_MAP[x.split('_')[2][:-4]] for x in files]
     files, labels = utils.resample_unbalanced_data(files, labels)
+    print labels
 
     return [os.path.join(img_dir, x) for x in files], [utils.to_one_hot(x, 3) for x in labels]
 
@@ -30,6 +31,7 @@ if __name__ == '__main__':
     neural_net, loss, accuracy = residual_cnn_classifier.nn_construction(IMAGE_SIZE, [BATCH_SIZE, NUM_CLASSES])
     run_config = tf.ConfigProto(allow_soft_placement=True)
     img_files, labels = _get_files_and_labels(FLAGS.input_path)
+    print labels
     try:
         os.mkdir(FLAGS.checkpoint_path)
     except Exception:
