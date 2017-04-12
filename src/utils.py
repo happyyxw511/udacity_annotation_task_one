@@ -41,6 +41,9 @@ def resample_unbalanced_data(file_list, label_list):
         selected_indices = indices[:minimum_count]
         resampled_file_list = np.append(resampled_file_list, file_list[selected_indices])
         resampled_label_list = np.append(resampled_label_list, label_list[selected_indices])
+    zipped = zip(resampled_file_list, resampled_label_list)
+    np.random.shuffle(zipped)
+    resampled_file_list, resampled_label_list = zip(*zipped)
     return resampled_file_list, resampled_label_list
 
 
