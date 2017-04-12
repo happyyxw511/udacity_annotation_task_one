@@ -23,7 +23,7 @@ def _get_files_and_labels(img_dir):
     labels = [CLASS_MAP[x.split('_')[2][:-4]] for x in files]
     files, labels = utils.resample_unbalanced_data(files, labels)
 
-    return [os.path.join(img_dir, x) for x in files], [utils.to_one_hot(CLASS_MAP[x.split('_')[2][:-4]], 3) for x in files]
+    return [os.path.join(img_dir, x) for x in files], [utils.to_one_hot(x, 3) for x in labels]
 
 if __name__ == '__main__':
     _get_files_and_labels(FLAGS.input_path)
