@@ -12,7 +12,7 @@ def nn_construction(x_input_shape, y_input_shape):
     conv_l1 = _conv_layer(x_placefolder, 3, 32, 1)
     pool_l1 = _max_pool(conv_l1, 2, 1)
     conv_l2 = _conv_layer(pool_l1, 3, 64, 1)
-    pool_l2 = _max_pool(conv_l2, 2, 1)
+    pool_l2 = _max_pool(conv_l2, 2, 2)
     print pool_l2.get_shape()
     fc_l1 = _fc_layer(pool_l2, 1024, dropout_placeholder)
     print fc_l1.get_shape()
