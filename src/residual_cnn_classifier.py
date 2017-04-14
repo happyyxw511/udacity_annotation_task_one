@@ -10,15 +10,15 @@ def nn_construction(x_input_shape, y_input_shape):
     dropout_placeholder = tf.placeholder(tf.float32, name='dropout')
 
     conv_l1 = _conv_layer(x_placefolder, 3, 32, 1)
-    pool_l1 = _max_pool(conv_l1, 2, 2)
+    pool_l1 = _max_pool(conv_l1, 2, 1)
     conv_l2 = _conv_layer(pool_l1, 3, 64, 1)
-    pool_l2 = _max_pool(conv_l2, 2, 2)
+    pool_l2 = _max_pool(conv_l2, 2, 1)
     print pool_l2.get_shape()
     fc_l1 = _fc_layer(pool_l2, 1024, dropout_placeholder)
     print fc_l1.get_shape()
     fc_l2 = _fc_layer(fc_l1, 3)
     output = tf.nn.softmax(fc_l2)
-    loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=output, labels=y_placeholder))
+    loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=fc_l2, labels=y_placeholder))
     # Evaluate model
     correct_pred = tf.equal(tf.argmax(output, 1), tf.argmax(y_placeholder, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
@@ -42,12 +42,19 @@ def train(sess, loss, accuracy, input_x_files, input_y, dropout, checkpoint_path
             next_index = cur_index + batch_size
             batch_images = np.zeros(batch_shape, dtype=np.float32)
             for ind, filename in enumerate(input_x_files[cur_index: next_index]):
-                batch_images[ind] = utils.load_image(filename)
+                image = utils.load_image(filename)/255.
+                batch_images[ind] = image - np.mean(image, axis=(0, 1))
+
             batch_images_labels = np.array(input_y[cur_index: next_index])
-            _, loss_value, accuracy_value = sess.run([optimizer, loss, accuracy], feed_dict={
+            sess.run([optimizer, loss, accuracy], feed_dict={
                 'X_Input:0': batch_images,
                 'Y_Input:0': batch_images_labels,
                 'dropout:0': dropout
+            })
+            loss_value, accuracy_value = sess.run([loss, accuracy], feed_dict={
+                'X_Input:0': batch_images,
+                'Y_Input:0': batch_images_labels,
+                'dropout:0': 1.
             })
             loss_list.append(loss_value)
             accuracy_list.append(accuracy_value)
